@@ -29,7 +29,9 @@ export class OntologyDrawer {
                 return Object.keys(this.valChildren).length === 0;
             };
             Object.defineProperty(this.dataMap[d.id], "children", {
-                get: function () { return this.getVisibleChildren(); }
+                get: function () {
+                    return this.getVisibleChildren();
+                }
             });
             this.dataMap[d.id].valChildren = function () {
             }
@@ -148,7 +150,7 @@ export class OntologyDrawer {
     switchVisibility(node, recursive) {
         if (!this.dataMap[node].isLeaf()) {
             this.dataMap[node].isFolded = !this.dataMap[node].isFolded;
-            this.setVisibility(node, this.dataMap[node].isFolded, recursive );
+            this.setVisibility(node, this.dataMap[node].isFolded, recursive);
         }
     }
 
@@ -197,7 +199,7 @@ export class OntologyDrawer {
             if (this.slices[summit.depth] === undefined) {
                 this.slices[summit.depth] = [];
             }
-            this.slices[summit.depth].push( summit );
+            this.slices[summit.depth].push(summit);
             for (let childId of Object.keys(summit.children)) {
                 summit.children[childId] = this.dataMap[childId];
                 if (alreadySeen.has(summit.children[childId])) {
@@ -213,7 +215,7 @@ export class OntologyDrawer {
             let i = 0;
             for (let n of this.slices[slice]) {
                 this.dataMap[n.id].evenNode = (i % 2 === 0);
-               i++;
+                i++;
             }
         }
 
@@ -279,8 +281,10 @@ export class OntologyDrawer {
         var treemap = d3.tree()
             // .separation(function(a, b) { return 10000; })
             // .separation(function(a, b) { return a.parent == b.parent ? 1 : 2;})
-                .separation(function(a, b) { return (a.data.label.length + b.data.label.length)/20; })
-                .nodeSize( [50, 150] )
+                .separation(function (a, b) {
+                    return (a.data.label.length + b.data.label.length) / 20;
+                })
+                .nodeSize([50, 150])
             // .size([width, height])
         ;
 
@@ -301,12 +305,12 @@ export class OntologyDrawer {
         svg.selectAll("g").remove();
         this.g = svg.append("g")
             .attr("transform",
-                function() {
+                function () {
                     let result = "";
                     if (this.horizontalLayout) {
                         result += `translate( ${margin.left} , ${margin.top + this.width * 5})`;
                     } else {
-                        result += `translate( ${margin.left+ this.width * 5} , ${margin.top})`;
+                        result += `translate( ${margin.left + this.width * 5} , ${margin.top})`;
                     }
                     result += "scale(1)";
                     return result;
@@ -331,24 +335,24 @@ export class OntologyDrawer {
             }.bind(this));
         link.append("title")
             .text((d) => {
-                // return `link between ${d.parent.data.id} -- [${this.dataMap[d.data.id].parentEdge.label}] --> ${d.data.id}` ;
-                let result = "";
-                let first = true;
-                if ("edgePropertiesToDisplay" in this.parameters) {
-                    for (let prop of this.parameters.edgePropertiesToDisplay) {
-                        if (first) {
-                            first = false;
-                        } else {
-                            result += `\n`;
-                        }
-                        if (this.dataMap[d.data.id].parentEdge !== undefined) {
-                            result += `${prop}: ${this.dataMap[d.data.id].parentEdge[prop]}`;
+                    // return `link between ${d.parent.data.id} -- [${this.dataMap[d.data.id].parentEdge.label}] --> ${d.data.id}` ;
+                    let result = "";
+                    let first = true;
+                    if ("edgePropertiesToDisplay" in this.parameters) {
+                        for (let prop of this.parameters.edgePropertiesToDisplay) {
+                            if (first) {
+                                first = false;
+                            } else {
+                                result += `\n`;
+                            }
+                            if (this.dataMap[d.data.id].parentEdge !== undefined) {
+                                result += `${prop}: ${this.dataMap[d.data.id].parentEdge[prop]}`;
+                            }
                         }
                     }
+                    return result;
                 }
-                return result;
-            }
-        );
+            );
 
 // begin: draw each node.
         var node = this.g.selectAll(".node")
@@ -406,7 +410,7 @@ export class OntologyDrawer {
 // adds the text to the node
         let textNode = node.append("text");
         textNode.attr("dy", ".35em")
-            .attr("y", function(d) {
+            .attr("y", function (d) {
                     if (!this.horizontalLayout) {
                         return d.data.evenNode ? "20" : "-20";
                     } else {
@@ -431,132 +435,200 @@ export class OntologyDrawer {
         };
         var zoom_handler = d3.zoom().on("zoom", zoomed.bind(this));
         zoom_handler(svg);
+        this.drawDend(nodes);
         return this;
     }
 
-    switchLayout() {
-        this.horizontalLayout = !this.horizontalLayout;
+drawDend(data) {
+    // radial dendrogram
+    const r = d3.tree(d3.hierarchy(data)
+        .sort((a, b) => (a.height - b.height) || a.data.data.id.localeCompare(b.data.data.id)));
+
+    const svg = d3.select("dend")
+        .style("width", "100%")
+        .style("height", "auto")
+        .style("padding", "10px")
+        .style("box-sizing", "border-box")
+        .style("font", "10px sans-serif");
+
+    const g = svg.append("g");
+
+    const link = g.append("g")
+        .attr("fill", "none")
+        .attr("stroke", "#555")
+        .attr("stroke-opacity", 0.4)
+        .attr("stroke-width", 1.5)
+        .selectAll("path")
+        .data(r.links())
+        .enter().append("path")
+        .attr("d", d3.linkRadial()
+            .angle(d => d.x)
+            .radius(d => d.y));
+
+    const node = g.append("g")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-width", 3)
+        .selectAll("g")
+        .data(r.descendants().reverse())
+        .enter().append("g")
+        .attr("transform", d => `
+        rotate(${d.x * 180 / Math.PI - 90})
+        translate(${d.y},0)
+      `);
+
+    node.append("circle")
+        .attr("fill", d => d.children ? "#555" : "#999")
+        .attr("r", 2.5);
+
+    node.append("text")
+        .attr("dy", "0.31em")
+        .attr("x", d => d.x < Math.PI === !d.children ? 6 : -6)
+        .attr("text-anchor", d => d.x < Math.PI === !d.children ? "start" : "end")
+        .attr("transform", d => d.x >= Math.PI ? "rotate(180)" : null)
+        .text(d => d.data.name)
+        .filter(d => d.children)
+        .clone(true).lower()
+        .attr("stroke", "white");
+
+    document.body.appendChild(svg.node());
+
+    const box = g.node().getBBox();
+
+    svg.remove()
+        .attr("width", box.width)
+        .attr("height", box.height)
+        .attr("viewBox", `${box.x} ${box.y} ${box.width} ${box.height}`);
+}
+
+switchLayout()
+{
+    this.horizontalLayout = !this.horizontalLayout;
+}
+
+centerDisplay()
+{
+    this.g.attr("transform", "translate( 0, 0)");
+}
+
+goTop()
+{
+    this.displayRoot = this.root;
+}
+
+up()
+{
+    if (this.dataMap[this.displayRoot].parent !== undefined) {
+        this.displayRoot = this.dataMap[this.displayRoot].parent;
     }
+}
 
-    centerDisplay() {
-        this.g.attr("transform", "translate( 0, 0)");
+addOptionButton()
+{
+    "use strict";
+    let selectButtonId = "selectButton";
+    if (d3.select(`#${selectButtonId}`).empty()) {
+        var fo = d3.select(this.svgId).append('foreignObject').attr("width", "100%").attr("height", "34px");
+        this.selectButton = fo.append("xhtml:select").attr("id", selectButtonId).attr("class", "select");
+        this.selectButton.selectAll("option").data(Object.keys(this.dataMap)).enter().append("option").attr("value", (d) => d).text((d) => this.dataMap[d].label);
+        this.selectButton.on("change", (d) => {
+            const selectValue = d3.select(`#${selectButtonId}`).property('value')
+            this.setDisplayRoot(selectValue);
+            this.draw(this.svgId);
+        });
     }
+}
 
-    goTop() {
-        this.displayRoot = this.root;
-    }
+drawCircle(svgId)
+{
+    this.svgId = svgId;
+    this.root = "Root";
+    this.computeHierarchy();
+    var svg = d3.select(svgId),
+        width = +svg.attr("width"),
+        height = +svg.attr("height");
+    var format = d3.format(",d");
 
-    up() {
-        if (this.dataMap[this.displayRoot].parent !== undefined) {
-            this.displayRoot = this.dataMap[this.displayRoot].parent;
-        }
-    }
+    var color = d3.scaleSequential(d3.interpolateMagma)
+        .domain([-4, 4]);
 
-    addOptionButton() {
-        "use strict";
-        let selectButtonId = "selectButton";
-        if (d3.select(`#${selectButtonId}`).empty()) {
-            var fo = d3.select(this.svgId).append('foreignObject').attr("width", "100%").attr("height", "34px");
-            this.selectButton = fo.append("xhtml:select").attr("id", selectButtonId).attr("class", "select");
-            this.selectButton.selectAll("option").data(Object.keys(this.dataMap)).enter().append("option").attr("value", (d) => d).text((d) => this.dataMap[d].label);
-            this.selectButton.on("change", (d) => {
-                const selectValue = d3.select(`#${selectButtonId}`).property('value')
-                this.setDisplayRoot(selectValue);
-                this.draw(this.svgId);
-            });
-        }
-    }
+    var stratify = d3.stratify()
+        .id((d) => d.id)
+        .parentId((d) => d.parent);
 
-    drawCircle(svgId) {
-        this.svgId = svgId;
-        this.root = "Root";
-        this.computeHierarchy();
-        var svg = d3.select(svgId),
-            width = +svg.attr("width"),
-            height = +svg.attr("height");
-        var format = d3.format(",d");
+    var pack = d3.pack()
+        .size([width - 2, height - 2])
+        .padding(3);
+    var root = stratify(Object.values(this.dataMap))
+        .sum(function (d) {
+            return d.value + 1;
+        })
+        .sort(function (a, b) {
+            return b.value - a.value;
+        })
+    ;
+    pack(root);
 
-        var color = d3.scaleSequential(d3.interpolateMagma)
-            .domain([-4, 4]);
-
-        var stratify = d3.stratify()
-            .id((d) => d.id)
-            .parentId((d) => d.parent);
-
-        var pack = d3.pack()
-            .size([width - 2, height - 2])
-            .padding(3);
-        var root = stratify(Object.values(this.dataMap))
-            .sum(function (d) {
-                return d.value + 1;
-            })
-            .sort(function (a, b) {
-                return b.value - a.value;
-            })
-        ;
-        pack(root);
-
-        var node = svg.select("g")
-            .selectAll("g")
-            .data(root.descendants())
-            .enter().append("g")
-            .attr("transform", function (d) {
-                return "translate(" + d.x + "," + d.y + ") scale(1)";
-            })
-            .attr("class", function (d) {
-                return "node" + (!d.children ? " node--leaf" : d.depth ? "" : " node--root");
-            })
-            .each(function (d) {
-                d.node = this;
-            });
-
-        node.append("circle")
-            .attr("id", function (d) {
-                return "node-" + d.id;
-            })
-            .attr("r", function (d) {
-                return d.r;
-            })
-            .style("fill", function (d) {
-                return color(d.depth);
-            });
-
-        var leaf = node.filter(function (d) {
-            return !d.children;
+    var node = svg.select("g")
+        .selectAll("g")
+        .data(root.descendants())
+        .enter().append("g")
+        .attr("transform", function (d) {
+            return "translate(" + d.x + "," + d.y + ") scale(1)";
+        })
+        .attr("class", function (d) {
+            return "node" + (!d.children ? " node--leaf" : d.depth ? "" : " node--root");
+        })
+        .each(function (d) {
+            d.node = this;
         });
 
-        leaf.append("clipPath")
-            .attr("id", function (d) {
-                return "clip-" + d.id;
-            })
-            .append("use")
-            .attr("xlink:href", function (d) {
-                return "#node-" + d.id + "";
-            });
+    node.append("circle")
+        .attr("id", function (d) {
+            return "node-" + d.id;
+        })
+        .attr("r", function (d) {
+            return d.r;
+        })
+        .style("fill", function (d) {
+            return color(d.depth);
+        });
 
-        leaf.append("text")
-            .attr("clip-path", function (d) {
-                return "url(#clip-" + d.id + ")";
-            })
-            .selectAll("tspan")
-            .data(function (d) {
-                console.log(d);
-                return [d.data.label];
-            })
-            .enter().append("tspan")
-            .attr("x", function (d, i, nodes) {
-                return -d.length * 2 - 13
-            })
-            .attr("y", function (d, i, nodes) {
-                return 3;
-            })
-            .text(function (d) {
-                return d;
-            });
+    var leaf = node.filter(function (d) {
+        return !d.children;
+    });
 
-        node.append("title")
-            .text(function (d) {
-                return d.data.label;
-            });
-    }
+    leaf.append("clipPath")
+        .attr("id", function (d) {
+            return "clip-" + d.id;
+        })
+        .append("use")
+        .attr("xlink:href", function (d) {
+            return "#node-" + d.id + "";
+        });
+
+    leaf.append("text")
+        .attr("clip-path", function (d) {
+            return "url(#clip-" + d.id + ")";
+        })
+        .selectAll("tspan")
+        .data(function (d) {
+            console.log(d);
+            return [d.data.label];
+        })
+        .enter().append("tspan")
+        .attr("x", function (d, i, nodes) {
+            return -d.length * 2 - 13
+        })
+        .attr("y", function (d, i, nodes) {
+            return 3;
+        })
+        .text(function (d) {
+            return d;
+        });
+
+    node.append("title")
+        .text(function (d) {
+            return d.data.label;
+        });
+}
 }
