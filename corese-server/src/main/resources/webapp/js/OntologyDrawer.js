@@ -293,27 +293,33 @@ export class OntologyDrawer {
 // appends a 'group' element to 'svg'
 // moves the 'group' element to the top left margin
         this.svg = d3.select(svgId);
+        this.zoomed = function () {
+            this.g.attr("transform", d3.event.transform);
+        };
+        this.zoomListener = d3.zoom().on("zoom", this.zoomed.bind(this));
+
+        this.svg.call(this.zoomListener);
         if (this.g === undefined) {
             this.g = this.svg
                 .append("g")
         }
         this.g.attr("transform",
             function () {
-                let result = "";
+                let transformation = d3.zoomIdentity;//.translate(x, y).scale(k);
                 if (this.horizontalLayout) {
-                    result += `translate( ${margin.left} , ${margin.top + width})`;
+                    transformation.translate( margin.left, margin.top + width);
                 } else {
-                    result += `translate( ${margin.left + width} , ${margin.top})`;
+                    transformation.translate( margin.left + width, margin.top);
                 }
-                result += "scale(1)";
-                return result;
-            }.bind(this));
+                this.svg.call(this.zoomListener.transform, transformation);
+            }.bind(this)
+        );
         // adds the links between the nodes
         this.g.selectAll(".link").remove();
         var link = this.g.selectAll(".link")
             .data(nodes.descendants().slice(1))
             .enter().append("path")
-            .attr("class", function(d) {
+            .attr("class", function (d) {
                 let result = "link";
                 if (d.data.parentEdge.class !== undefined) {
                     result = `${result} ${d.data.parentEdge.class}`;
@@ -429,12 +435,7 @@ export class OntologyDrawer {
             });
 // end: draw each node.
 
-        this.zoomed = function () {
-            this.g.attr("transform", d3.event.transform);
-        };
-        this.zoomListener = d3.zoom().on("zoom", this.zoomed.bind(this));
 
-        this.svg.call(this.zoomListener);
         return this;
     }
 
