@@ -307,10 +307,11 @@ export class OntologyDrawer {
             function () {
                 let transformation = d3.zoomIdentity;//.translate(x, y).scale(k);
                 if (this.horizontalLayout) {
-                    transformation.translate( margin.left, margin.top + width);
+                    transformation = transformation.translate( margin.left, margin.top + width);
                 } else {
-                    transformation.translate( margin.left + width, margin.top);
+                    transformation = transformation.translate( margin.left + width, margin.top);
                 }
+                transformation = transformation.scale(1);
                 this.svg.call(this.zoomListener.transform, transformation);
             }.bind(this)
         );
@@ -319,8 +320,8 @@ export class OntologyDrawer {
         var link = this.g.selectAll(".link")
             .data(nodes.descendants().slice(1))
             .enter().append("path")
-            .attr("class", function (d) {
-                let result = "link";
+            .attr("class", function(d) {
+                let result = "ontology_edge";
                 if (d.data.parentEdge.class !== undefined) {
                     result = `${result} ${d.data.parentEdge.class}`;
                 }
@@ -367,7 +368,7 @@ export class OntologyDrawer {
             .enter().append("g")
             .attr("class", function (_dataMap) {
                     return function (d) {
-                        let result = "node" +
+                        let result = "ontology_node" +
                             (_dataMap[d.data.id].isFolded ?
                                 " node--folded" :
                                 (_dataMap[d.data.id].isLeaf() ? " node--leaf" : " node--internal"));
@@ -444,7 +445,10 @@ export class OntologyDrawer {
     }
 
     centerDisplay() {
-        this.svg.call(this.zoomListener.transform, d3.zoomIdentity);
+        let bbox = this.g.node().getBBox();
+        let t = d3.zoomIdentity;
+        t = t.translate( -bbox.width, -bbox.height);
+        this.svg.call(this.zoomListener.transform, t);
     }
 
     goTop() {
@@ -494,7 +498,7 @@ export class OntologyDrawer {
                 return "translate(" + d.x + "," + d.y + ") scale(1)";
             })
             .attr("class", function (d) {
-                return "node" + (!d.children ? " node--leaf" : d.depth ? "" : " node--root");
+                return "circle_node" + (!d.children ? " node--leaf" : d.depth ? "" : " node--root");
             })
             .each(function (d) {
                 d.node = this;

@@ -14,6 +14,23 @@
 	width: 33%; /* Assume there is three columns */
 	overflow: auto;
 }
+
+
+
+.ontology_edge {fill: none;stroke: lightgrey;stroke-width: 1px;}
+.ontology_edge.rdfs_subclassof {stroke: yellow; }
+.ontology_edge.rdfs_instanceof {stroke: green;stroke-dasharray: 3,3;}
+.ontology_edge.rdfs_prop1 {stroke: blue;stroke-dasharray: 1,2,3;}
+.ontology_edge.rdfs_prop4 {stroke: lime;stroke-dasharray: 1,2,3,5,8;stroke-width:10px}
+
+.ontology_node circle { fill: #fff; stroke: steelblue; stroke-width: 2px; }
+.ontology_node.uri circle    { fill: #fff; stroke: steelblue;  }
+.ontology_node.literal circle{ fill: #fff; stroke: steelblue;  }
+.ontology_node.bnode  circle { fill: #fff; stroke: steelblue;  }
+.ontology_node.other  circle { fill: #fff; stroke: steelblue;  }
+.ontology_node.main  circle  { fill: #fff; stroke: steelblue;  }
+
+g.individual circle {fill: #fff;stroke: green; }
 /*
  *  Style for the tree layout of the ontology.
  */
@@ -52,20 +69,6 @@
 }
 
 
-path.link {fill: none;stroke: lightgrey;stroke-width: 1px;}
-path.rdfs_subclassof {stroke: yellow; }
-path.rdfs_instanceof {stroke: green;stroke-dasharray: 3,3;}
-path.rdfs_prop1 {stroke: blue;stroke-dasharray: 1,2,3;}
-path.rdfs_prop4 {stroke: lime;stroke-dasharray: 1,2,3,5,8;stroke-width:10px}
-
-g circle  { fill: #fff; stroke: steelblue; stroke-width: 2px; }
-g.uri circle    { fill: #fff; stroke: steelblue;  }
-g.literal circle{ fill: #fff; stroke: steelblue;  }
-g.bnode  circle { fill: #fff; stroke: steelblue;  }
-g.other  circle { fill: #fff; stroke: steelblue;  }
-g.main  circle  { fill: #fff; stroke: steelblue;  }
-
-g.individual circle {fill: #fff;stroke: green; }
 
 
 text.literal { fill: lightgreen; }
