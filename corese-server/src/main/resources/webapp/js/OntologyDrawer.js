@@ -174,16 +174,16 @@ export class OntologyDrawer {
         this.invertProperties = {};
         let newProperties = new Set();
         for (let currentProp of this.properties.values()) {
-            //if (currentProp[0] === '-') {
-            //    this.properties.delete(currentProp);
-            //    currentProp = currentProp.substring(1, currentProp.length);
-            //    this.invertProperties[currentProp] = true;
-            //} else {
-            //    if (currentProp[0] === '+') {
-            //        currentProp = currentProp.substring(1, currentProp.length);
-            //    }
-            this.invertProperties[currentProp] = true;
-            //}
+            if (currentProp[0] === "-") {
+               // this.properties.delete(currentProp);
+               currentProp = currentProp.substring(1, currentProp.length);
+               this.invertProperties[currentProp] = false;
+            } else {
+               if (currentProp[0] === "+") {
+                   currentProp = currentProp.substring(1, currentProp.length);
+               }
+                this.invertProperties[currentProp] = true;
+            }
             newProperties.add(currentProp);
         }
         this.properties = newProperties;
@@ -355,23 +355,6 @@ export class OntologyDrawer {
             this.g = this.svg
                 .append("g")
         }
-        // this.g.attr("transform",
-        //     function () {
-        //         // let t = d3.zoom();
-        //         // let result = "";
-        //         // if (!this.horizontalLayout) {
-        //         //     t = t.translate(-margin.left, margin.top + width);
-        //         //     // result += `translate( ${margin.left} , ${margin.top + width})`;
-        //         // } else {
-        //         //     t = t.translate(-margin.left + width, margin.top );
-        //         //     // result += `translate( ${margin.left + width} , ${margin.top})`;
-        //         // }
-        //         this.svg.call(this.zoomListener.transform, t);
-        //         // result += "scale(1)";
-        //         return result;
-        //     }.bind(this));
-        // this.centerDisplay();
-        // adds the links between the nodes
         this.g.selectAll(".link").remove();
         const link = this.g.selectAll(".link")
             .data(nodes.descendants().slice(1))
@@ -506,7 +489,17 @@ export class OntologyDrawer {
     }
 
     centerDisplay() {
-        this.svg.call(this.zoomListener.transform, d3.zoomIdentity);
+        let divHeight = this.svg.node().parentNode.clientHeight;
+        let divWidth = this.svg.node().parentNode.clientWidth;
+        let bbox = this.g.node().getBBox();
+        let tx = - bbox.x;
+        let ty = - bbox.y;
+        let scale = Math.min( divHeight / bbox.height, divWidth / bbox.width );
+        let zoom = d3.zoomTransform(this.svg.node());
+        zoom.k = scale;
+        zoom.x = tx * scale;
+        zoom.y = ty * scale;
+        this.svg.call(this.zoomListener.transform, zoom );
     }
 
     goTop() {
