@@ -4,8 +4,6 @@ import fr.inria.corese.compiler.eval.QuerySolver;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.GraphStore;
 import fr.inria.corese.core.load.Load;
@@ -28,7 +26,6 @@ import fr.inria.corese.core.util.SPINProcess;
 import fr.inria.corese.sparql.datatype.RDF;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 
 import fr.inria.corese.sparql.api.IDatatype;
@@ -46,7 +43,6 @@ import fr.inria.corese.kgram.api.core.DatatypeValue;
 import fr.inria.corese.kgram.api.core.Edge;
 import fr.inria.corese.kgram.api.core.ExprType;
 import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.PointerType;
 import fr.inria.corese.kgram.core.Mapping;
 import fr.inria.corese.kgram.core.Mappings;
 import fr.inria.corese.kgram.core.Query;
@@ -55,8 +51,9 @@ import fr.inria.corese.sparql.datatype.extension.CoresePointer;
 import fr.inria.corese.sparql.exceptions.LDScriptException;
 import fr.inria.corese.sparql.exceptions.UndefinedExpressionException;
 import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.parser.Access;
-import fr.inria.corese.sparql.triple.parser.Access.Feature;
+// import fr.inria.corese.kgram.api.core.PointerType;
+// import fr.inria.corese.sparql.triple.parser.Access;
+// import fr.inria.corese.sparql.triple.parser.Access.Feature;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -69,7 +66,6 @@ import org.apache.logging.log4j.LogManager;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
-
 
 import static org.junit.Assert.*;
 
@@ -4775,7 +4771,7 @@ public class TestQuery1 {
     }
 
 
-    public void testBnode() throws EngineException, LoadException, ParserConfigurationException, SAXException, IOException {
+    public void testBnode() throws EngineException, LoadException, IOException {
         Graph g = Graph.create();
         QueryProcess exec = QueryProcess.create(g);
 
@@ -5318,7 +5314,7 @@ public class TestQuery1 {
     }
 
 
-    public void testGeneralize() throws EngineException, LoadException, ParserConfigurationException, SAXException, IOException {
+    public void testGeneralize() throws EngineException, LoadException, IOException {
         Graph g = Graph.create(true);
         QueryProcess exec = QueryProcess.create(g);
         String init = "prefix ex: <http://example.org/>"
@@ -8573,16 +8569,7 @@ public class TestQuery1 {
 
             assertEquals("Result", 5, map.size());
 
-        } catch (EngineException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SAXException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
