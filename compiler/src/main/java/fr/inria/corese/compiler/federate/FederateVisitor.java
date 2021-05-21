@@ -119,6 +119,7 @@ public class FederateVisitor implements QueryVisitor, URLParam {
         query.setFederate(true);
         ASTQuery ast = (ASTQuery) query.getAST();
         ast.getLog().setAST(ast);
+        exec.getLog().setAST(ast);
     }
     
     @Override
@@ -295,10 +296,10 @@ public class FederateVisitor implements QueryVisitor, URLParam {
         }
         Service serv = Service.create(list, body);
         ast.setBody(ast.bgp(serv));
+        // TODO: check inherit limit ??? offset ???
+        complete(ast);        
         // include external values clause inside body
         prepare(ast);
-        // TODO: check inherit limit ??? offset ???
-        complete(ast);
         variable(ast);
         finish(ast);       
     }
