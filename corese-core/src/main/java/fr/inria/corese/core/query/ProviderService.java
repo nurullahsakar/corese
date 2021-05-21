@@ -103,7 +103,9 @@ public class ProviderService implements URLParam {
         // slice by default
         Mappings res = send(serviceList, serv, (skipBind) ? null : getMappings(), bslice, slice);
         restore(getAST());
-        res.limit(getAST().getLimit());
+        if (res != null) {
+            res.limit(getAST().getLimit());
+        }
         return res;
     }
     
@@ -341,7 +343,7 @@ public class ProviderService implements URLParam {
         logger.error("service error: " + serv.getServer());
         logger.error(e.getMessage());
         logger.error(ast.toString());
-        gq.addError(SERVICE_ERROR, e);
+        gq.addError(SERVICE_ERROR.concat(serv.getServer()).concat("\n"), e);
     }
     
     
@@ -357,8 +359,8 @@ public class ProviderService implements URLParam {
             g = (Graph) serv.getGraph();
         } else {
             res = eval(ast, serv, timeout, count);
-            if (res.getLink()!=null){
-                getLog().addLink(res.getLink());
+            if (!res.getLinkList().isEmpty()){
+                getLog().addLink(res.getLinkList());
             }
             g = (Graph) res.getGraph();
         }

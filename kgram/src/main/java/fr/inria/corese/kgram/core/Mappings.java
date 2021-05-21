@@ -71,13 +71,14 @@ public class Mappings extends PointerObject
     private Node result;
     private Binder binding;
     private Object provenance;
-    private String link;
+    private List<String> link;
     private int length = 0;
     private int queryLength = 0;
     private int display = Integer.MAX_VALUE;
 
     public Mappings() {
         list = new ArrayList<>();
+        link = new ArrayList<>();
     }
 
     Mappings(Mapping map) {
@@ -663,7 +664,12 @@ public class Mappings extends PointerObject
         sm2 = m2;
         Node[] order1 = m1.getOrderBy();
         Node[] order2 = m2.getOrderBy();
-
+        
+//        for (Node n : order1) { System.out.print(n + " " );}
+//        System.out.println();
+//        for (Node n : order2) { System.out.print(n + " " );}
+//        System.out.println();
+        
         List<Exp> orderBy = query.getOrderBy();
 
         int res = 0;
@@ -824,7 +830,10 @@ public class Mappings extends PointerObject
                     Event event = EventImpl.create(Event.AGG, exp);
                     manager.send(event);
                 }
-                eval(evaluator, exp, memory, p, (isSelect) ? SELECT : n++);
+                eval(evaluator, exp, memory, p, (isSelect) ? SELECT : n);
+            }
+            if (!isSelect)  {
+                n++;
             }
         }
     }
@@ -959,7 +968,7 @@ public class Mappings extends PointerObject
                                 (node == null) ? null : node.getDatatypeValue());
                 }
             }
-
+            
             if (hasEvent) {
                 Event event = EventImpl.create(Event.FILTER, exp, node);
                 manager.send(event);
@@ -1743,58 +1752,49 @@ public class Mappings extends PointerObject
         }
     }
 
-    /**
-     * @return the link
-     */
     public String getLink() {
+        if (getLinkList().isEmpty()) {
+            return null;
+        }
+        return getLinkList().get(0);
+    }
+
+    public void setLink(String link) {
+        addLink(link);
+    }
+    
+    public void addLink(String link) {
+        getLinkList().add(link);
+    }
+    
+    public List<String> getLinkList() {
         return link;
     }
 
-    /**
-     * @param link the link to set
-     */
-    public void setLink(String link) {
+    public void setLinkList(List<String> link) {
         this.link = link;
     }
 
-    /**
-     * @return the length
-     */
     public int getLength() {
         return length;
     }
 
-    /**
-     * @param length the length to set
-     */
     public void setLength(int length) {
         this.length = length;
     }
 
-    /**
-     * @return the queryLength
-     */
     public int getQueryLength() {
         return queryLength;
     }
 
-    /**
-     * @param queryLength the queryLength to set
-     */
     public void setQueryLength(int queryLength) {
         this.queryLength = queryLength;
     }
 
-    /**
-     * @return the display
-     */
     public int getDisplay() {
         return display;
     }
 
-    /**
-     * @param display the display to set
-     */
     public void setDisplay(int display) {
         this.display = display;
     }
