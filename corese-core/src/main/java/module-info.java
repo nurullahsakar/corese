@@ -31,6 +31,8 @@ module fr.inria.corese.corese_core {
     exports fr.inria.corese.core.edge;
     exports fr.inria.corese.core.logic;
     exports fr.inria.corese.core.producer;
+    exports fr.inria.corese.core.shacl;
+    exports fr.inria.corese.core.extension;
 
 //    requires fr.inria.corese.compiler;
 //    requires org.slf4j;

@@ -51,9 +51,9 @@ import fr.inria.corese.sparql.datatype.extension.CoresePointer;
 import fr.inria.corese.sparql.exceptions.LDScriptException;
 import fr.inria.corese.sparql.exceptions.UndefinedExpressionException;
 import fr.inria.corese.sparql.triple.function.term.Binding;
-// import fr.inria.corese.kgram.api.core.PointerType;
-// import fr.inria.corese.sparql.triple.parser.Access;
-// import fr.inria.corese.sparql.triple.parser.Access.Feature;
+import fr.inria.corese.kgram.api.core.PointerType;
+import fr.inria.corese.sparql.triple.parser.Access;
+import fr.inria.corese.sparql.triple.parser.Access.Feature;
 
 import java.io.File;
 import java.net.MalformedURLException;
