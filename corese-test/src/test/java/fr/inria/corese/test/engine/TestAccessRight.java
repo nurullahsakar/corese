@@ -19,7 +19,7 @@ import org.junit.Test;
  * @author corby
  */
 public class TestAccessRight {
-    static String data  = Thread.currentThread().getContextClassLoader().getResource("data/").getPath() ;
+    static String data  = TestAccessRight.class.getResource("data").getPath();
     
      
          //@Test

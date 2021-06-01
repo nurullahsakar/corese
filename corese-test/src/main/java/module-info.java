@@ -6,4 +6,6 @@ module fr.inria.corese.corese_test {
     requires java.logging;
     requires shexjava.core;
     requires rdf4j.model;
+
+    opens fr.inria.corese.test.engine;
 }

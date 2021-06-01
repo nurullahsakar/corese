@@ -12,6 +12,7 @@ import fr.inria.corese.sparql.triple.parser.AccessNamespace;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -48,6 +49,7 @@ public class TestAccessRightNS {
 
  
 
+    @Ignore
     @Test
     public void mytest8() throws EngineException {
         System.out.println("TEST8");
@@ -87,6 +89,7 @@ public class TestAccessRightNS {
     }
 
     @Test
+    @Ignore
     public void mytest6() throws EngineException {
         String q = "prefix ff: </user/corby/home/AATest/data/junit/function/accept.rq/>"
                 // + "@import ff: "
@@ -150,6 +153,7 @@ public class TestAccessRightNS {
         
     }
 
+    @Ignore
     @Test
     public void mytest3() throws EngineException {
         String q = "prefix ff: </user/corby/home/AATest/data/junit/function/accept.rq/>"
@@ -197,6 +201,7 @@ public class TestAccessRightNS {
     }
 
     @Test
+    @Ignore
     public void mytest1() throws EngineException {
         String q = "prefix ff: </user/corby/home/AATest/data/junit/function/accept.rq/>"
                 + "@import ff: "

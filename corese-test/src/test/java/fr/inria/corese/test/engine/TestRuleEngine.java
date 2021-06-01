@@ -40,16 +40,16 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestRuleEngine {
 	
-        static String data  = Thread.currentThread().getContextClassLoader().getResource("data").getPath() + "/";
+    static String data = TestRuleEngine.class.getResource("data").getPath();;
 	static Graph graph;
 	static Engine rengine;
 	static RuleEngine fengine;
 
         	
 	@BeforeClass
-	public static void init() throws EngineException {	
-		//Graph.setCompareIndex(true);
-		QuerySolver.definePrefix("c", "http://www.inria.fr/acacia/comma#");	
+	public static void init() throws EngineException {
+        //Graph.setCompareIndex(true);
+        QuerySolver.definePrefix("c", "http://www.inria.fr/acacia/comma#");
                 //Load.setDefaultGraphValue(true);
                 //EdgeIndexer.test = false;
 

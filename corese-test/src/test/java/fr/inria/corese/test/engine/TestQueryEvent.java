@@ -26,7 +26,7 @@ import org.junit.Test;
  * @author corby
  */
 public class TestQueryEvent {
-     static String data  = Thread.currentThread().getContextClassLoader().getResource("data/").getPath() ;
+     static String data  = TestQueryEvent.class.getResource("data").getPath();
    
       @Test
     public void testmethod() throws EngineException, LoadException {
